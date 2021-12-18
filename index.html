@@ -5,9 +5,13 @@
 <html lang="en">
     <body>
         pokedex search
-                <input id="inp" onfocusout = "search(this)" class = "top">
+		<br>
+                <input id="inp" class = "top">
+				<input type="checkbox" id="containsCheckbox"> Contains
+				<button id="search" onclick = "search()">Search</button>
                 <button id="Save" onclick = "saveSearchTerm()">Save</button>
             <br>
+			<div id = "searchResultInfo"></div>
             <div id = "savedTerms"></div>
                     <div>
             <div id="results"></div>
@@ -19,27 +23,50 @@
     .top{
         vertical-align:top;
     }
+	#searchResultInfo{
+		color:red
+	}
+	
 </style>
         
 <script type='text/javascript' src='dexentries.js'></script>
 <script>        
             
-    let search = (input) => {
-        console.log("searching")
-        let item = input.value
-        let searchterms = Array.from(document.getElementsByClassName("searchTerm")).map(a=>a.innerText)
-        searchterms.push(item)
-        removeAllChildNodes(document.getElementById("results"))
-        Object.keys(dexentries).forEach(mon => {
-            let found = false
-            searchterms.forEach(item=>{
-                let reg = new RegExp("[^a-z]" + item,"i");
-                if (!found && dexentries[mon].match(reg) !== null){
-                    addEntry(mon,dexentries[mon],item)
-                    found = true
-                }
-            })
-        })
+    let search = () => {
+		const input = document.getElementById("inp");
+		const searchTerm = input.value;
+		if (searchTerm.length > 1){
+			document.title = "searching";
+			let item = searchTerm;
+			let searchterms = Array.from(document.getElementsByClassName("searchTerm")).map(a=>a.innerText)
+			searchterms.push(item)
+			removeAllChildNodes(document.getElementById("results"))
+			
+			
+			let itemsProcessed = 0;
+			let foundCount = 0;
+
+			Object.keys(dexentries).forEach(mon => {
+				let found = false
+				searchterms.forEach(item=>{
+					const reg = (document.getElementById("containsCheckbox").checked) ? new RegExp(item ,"i") : new RegExp("[^a-z]" + item + "[^a-z]","i");
+					if (!found && dexentries[mon].match(reg) !== null){
+						addEntry(mon,dexentries[mon],item)
+						found = true;
+						foundCount++;
+					}
+					itemsProcessed++;
+					if(itemsProcessed === Object.keys(dexentries).length) {
+					  document.title  = "found: " + foundCount;
+					}
+
+				})
+			})
+			
+		}
+		else{
+			document.getElementById("searchResultInfo").textContent = "Entry too short (must be >1 character)"
+		}
     }
 
     let saveSearchTerm = () => {
@@ -53,7 +80,9 @@
     
     let addEntry = (title,entry,keyword) => {
         let div = document.createElement("div")
-        div.innerHTML =  `<b>${title}</b><br>${entry}<br>`
+        div.innerHTML =  `
+			<b>${title}</b>
+			<br>${entry}<br>`
         div.innerHTML = div.innerHTML.replaceAll(keyword,`<b style="color:red">${keyword}</b>`)
         document.getElementById("results").appendChild(div)
         }
