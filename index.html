@@ -4,14 +4,35 @@
 
 <html lang="en">
     <body>
-        pokedex search
+		Click the Search button or hit enter to search
+		<br>
+		Try: "seven colors", "Alolan", "meat"
 		<br>
                 <input id="inp" class = "top">
-				<input type="checkbox" id="containsCheckbox"> Contains
-				<button id="search" onclick = "search()">Search</button>
-                <button id="Save" onclick = "saveSearchTerm()">Save</button>
+				<input type="checkbox" id="containsCheckbox" onclick = "search()"> Contains
+				<input type="checkbox" id="removeCopies" onclick = "search()"> Remove Duplicates
+				<input type="checkbox" id="onlyMatched" onclick = "search()"> Only Matching Entries
             <br>
-			<div id = "searchResultInfo"></div>
+			<button id="search" onclick = "search()">Search</button>
+			<script>
+				//enter key to click
+				// Get the input field
+				const input = document.getElementById("inp");
+
+				// Execute a function when the user releases a key on the keyboard
+				input.addEventListener("keyup", function(event) {
+				  // Number 13 is the "Enter" key on the keyboard
+				  if (event.keyCode === 13) {
+					// Cancel the default action, if needed
+					event.preventDefault();
+					// Trigger the button element with a click
+					document.getElementById("search").click();
+				  }
+				}); 
+			</script>
+			<button id="Save" onclick = "saveSearchTerm()">Save Term</button>
+			<span id = "searchResultInfo"></span>
+			<br>
             <div id = "savedTerms"></div>
                     <div>
             <div id="results"></div>
@@ -26,17 +47,26 @@
 	#searchResultInfo{
 		color:red
 	}
+	.text:after {
+		/* This value is the OPPOSITE color of our background */
+		color: rgb(0, 255, 255); 
+		mix-blend-mode: difference;
+	}
+	*{
+		font-family: Arial, Helvetica, sans-serif;
+	}
 	
 </style>
         
 <script type='text/javascript' src='dexentries.js'></script>
 <script>        
-            
+//get rid of links
+//
     let search = () => {
 		const input = document.getElementById("inp");
 		const searchTerm = input.value;
 		if (searchTerm.length > 1){
-			document.title = "searching";
+			document.title = "Pokedex Search | searching";
 			let item = searchTerm;
 			let searchterms = Array.from(document.getElementsByClassName("searchTerm")).map(a=>a.innerText)
 			searchterms.push(item)
@@ -47,17 +77,19 @@
 			let foundCount = 0;
 
 			Object.keys(dexentries).forEach(mon => {
+				dexentryHTML = Object.values(dexentries[mon]).join("\n");
 				let found = false
 				searchterms.forEach(item=>{
 					const reg = (document.getElementById("containsCheckbox").checked) ? new RegExp(item ,"i") : new RegExp("[^a-z]" + item + "[^a-z]","i");
-					if (!found && dexentries[mon].match(reg) !== null){
+					if ( !found && (dexentryHTML.match(reg) !== null || mon.toLowerCase().includes(item.toLowerCase())) ){
 						addEntry(mon,dexentries[mon],item)
 						found = true;
 						foundCount++;
 					}
 					itemsProcessed++;
 					if(itemsProcessed === Object.keys(dexentries).length) {
-					  document.title  = "found: " + foundCount;
+					  document.getElementById("searchResultInfo").textContent  = "found: " + foundCount;
+					  document.title  = "Pokedex Search | found: " + foundCount;
 					}
 
 				})
@@ -77,15 +109,129 @@
         document.getElementById("savedTerms").appendChild(div)
         search(document.getElementById("inp").value)
     }
-    
-    let addEntry = (title,entry,keyword) => {
-        let div = document.createElement("div")
-        div.innerHTML =  `
+	
+	colors = {
+	  "Red": "rgb(255, 17, 17)",
+	  "RedBlue": "rgb(255, 17, 17)",
+	  "Blue": "rgb(17, 17, 255)",
+	  "Yellow": "rgb(255, 215, 51)",
+	  "Gold": "rgb(218, 165, 32)",
+	  "Silver": "rgb(192, 192, 192)",
+	  "Crystal": "rgb(79, 217, 255)",
+	  "Ruby": "rgb(160, 0, 0)",
+	  "RS": "rgb(160, 0, 0)",
+	  "Sapphire": "rgb(0, 0, 160)",
+	  "Emerald": "rgb(0, 160, 0)",
+	  "FireRed": "rgb(255, 115, 39)",
+	  "LeafGreen": "rgb(0, 221, 0)",
+	  "Diamond": "rgb(170, 170, 255)",
+	  "DPP": "rgb(170, 170, 255)",
+	  "Pearl": "rgb(255, 170, 170)",
+	  "Platinum": "rgb(153, 153, 153)",
+	  "HeartGold": "rgb(182, 158, 0)",
+	  "HG": "rgb(182, 158, 0)",
+	  "SoulSilver": "rgb(192, 192, 225)",
+	  "SS": "rgb(192, 192, 225)",
+	  "Black": "rgb(68, 68, 68)",
+	  "White": "rgb(225, 225, 225)",
+	  "Black 2": "rgb(66, 75, 80)",
+	  "B2W2": "rgb(66, 75, 80)",
+	  "White 2": "rgb(227, 206, 208)",
+	  "X": "rgb(2, 93, 166)",
+	  "Y": "rgb(234, 26, 62)",
+	  "Omega Ruby": "rgb(171, 40, 19)",
+	  "OmRuby": "rgb(171, 40, 19)",
+	  "ORAS": "rgb(171, 40, 19)",
+	  "Alpha Sapphire": "rgb(38, 100, 156)",
+	  "AlSapph": "rgb(38, 100, 156)",
+	  "Sun": "rgb(241, 145, 43)",
+	  "Moon": "rgb(85, 153, 202)",
+	  "Ultra Sun": "rgb(233, 91, 43)",
+	  "USun": "rgb(233, 91, 43)",
+	  "Ultra Moon": "rgb(34, 109, 181)",
+	  "UMoon": "rgb(34, 109, 181)",
+	  "Let's Go Pikachu": "rgb(245, 218, 38)",
+	  "LGPE": "rgb(245, 218, 38)",
+	  "Let's Go Eevee": "rgb(212, 146, 75)",
+	  "Sword": "rgb(0, 161, 233)",
+	  "Shield": "rgb(191, 0, 79)"
+	}
+
+    let addEntry = (title,mon,keyword) => {
+		
+		//console.log(mon);
+		let div = document.createElement("div")
+		let divHTML =  `
 			<b>${title}</b>
-			<br>${entry}<br>`
-        div.innerHTML = div.innerHTML.replaceAll(keyword,`<b style="color:red">${keyword}</b>`)
-        document.getElementById("results").appendChild(div)
-        }
+			<table class="roundy" style="background:#FFF; padding:3px;" width="100%">
+				<tbody>
+		`
+	
+		
+		const createEachEntry = (thisColor, source, descrip) => {
+			let bgColor = "rgb(0,0,0)"
+			if (colors[thisColor] !== undefined) bgColor = colors[thisColor];
+			let midHTML = "";
+			entryInfo = descrip.replaceAll(new RegExp("(" + keyword + ")",'ig'),`<b style="color:red">$&</b>`);
+			midHTML += "<tr>"
+			midHTML += `<th class="text" style="width: 80px; max-width: 100px; color:white; background:${bgColor}; border-radius: 10px; border: 2px solid ${bgColor}; line-height:12pt;">${source}</th>`;
+			midHTML += `<td style="vertical-align: middle; border: 1px solid #999; padding-left:3px;">${entryInfo}</td>`;
+			midHTML += "</tr>"
+			return midHTML;
+		}
+
+		let midHTML = "";
+		
+		if (document.getElementById("removeCopies").checked) {
+			//remove same copies
+			const removeCopies = (mon) => {
+				const uniques = []
+				Object.values(mon).forEach(mon=>{
+					if (! uniques.map(a=>a.toLowerCase()).includes(mon.toLowerCase()) ) uniques.push(mon)
+				});
+				const o2 = {};
+				uniques.forEach(a=>o2[a] = []);
+				//console.log(uniques)
+				Object.keys(mon).forEach(key => {
+					if (uniques.includes(mon[key])) o2[mon[key]].push(key)
+					//does not include the lowercase caps lol
+				});
+				return o2;
+			}
+			/////////////////////
+			mon = removeCopies(mon)
+			//console.log(mon)
+			Object.keys(mon).forEach(key =>{
+				//console.log(mon[key])
+				if (!document.getElementById("onlyMatched").checked || key.toLowerCase().includes(keyword.toLowerCase()) ){
+					let thisColor = mon[key][0].replace(/ \d/,"")
+					let entryInfo = key
+					let source = mon[key].join("<br>");
+					if (source !== "source"){
+						midHTML += createEachEntry(thisColor,source,entryInfo)
+					}
+				}
+			})
+		}
+		
+		else{//if should show all pokedex entries separately
+			Object.keys(mon).forEach(key =>{
+				if (!document.getElementById("onlyMatched").checked || mon[key].toLowerCase().includes(keyword.toLowerCase()) ){
+					let thisColor = key.replace(/ \d/,"")
+					let entryInfo = mon[key]
+					let source = key;
+					if (source !== "source"){
+						midHTML += createEachEntry(thisColor,source,entryInfo)
+					}
+				}
+			})
+		}
+		
+		footHTML = `</tr></tbody></table>`;
+		div.innerHTML = divHTML + midHTML + footHTML;
+		document.getElementById("results").appendChild(div);
+		
+     }
     
     
     let removeAllChildNodes = (parent) => {
@@ -93,5 +239,12 @@
             parent.removeChild(parent.firstChild);
         }
     }
+	
+	window.onload = () => {
+		document.title = "Pokedex Search";
+		if (document.getElementById("inp").value !== "") search();
+	}
+	
+	
     </script>
 </html>
