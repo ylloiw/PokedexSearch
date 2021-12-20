@@ -4,9 +4,11 @@
 
 <html lang="en">
     <body>
-		Click the Search button or hit enter to search
+		Click the Search button or hit enter to search.
 		<br>
-		Try: "seven colors", "Alolan", "meat"
+		'Save Term' keeps search results visible between searches. Click the saved term to clear.
+		<br>
+		Try: "seven colors", "royal", "meat", "legend"
 		<br>
                 <input id="inp" class = "top">
 				<input type="checkbox" id="containsCheckbox" onclick = "search()"> Contains
@@ -34,9 +36,8 @@
 			<span id = "searchResultInfo"></span>
 			<br>
             <div id = "savedTerms"></div>
-                    <div>
             <div id="results"></div>
-                    </div>
+			<br>
         
     </body>
 
@@ -47,13 +48,16 @@
 	#searchResultInfo{
 		color:red
 	}
-	.text:after {
+	.text {
 		/* This value is the OPPOSITE color of our background */
-		color: rgb(0, 255, 255); 
-		mix-blend-mode: difference;
+		color: white;
+		text-shadow:1px 1px #000;
 	}
 	*{
 		font-family: Arial, Helvetica, sans-serif;
+	}
+	.title {
+	  font-size: 20px;
 	}
 	
 </style>
@@ -101,11 +105,12 @@
 		}
     }
 
+	const clearDiv = () => {document.getElementById("savedTerms").innerHTML = ""};
     let saveSearchTerm = () => {
-      let div = document.createElement("div")
+      const div = document.createElement("div")
       div.className = "searchTerm"
         //div.style.display = "inline-block"
-      div.innerHTML =  `<b>${document.getElementById("inp").value}</b>`
+      div.innerHTML =  `<b onclick=clearDiv()>${document.getElementById("inp").value}</b>`
         document.getElementById("savedTerms").appendChild(div)
         search(document.getElementById("inp").value)
     }
@@ -162,7 +167,7 @@
 		//console.log(mon);
 		let div = document.createElement("div")
 		let divHTML =  `
-			<b>${title}</b>
+			<b class="title">${title}</b>
 			<table class="roundy" style="background:#FFF; padding:3px;" width="100%">
 				<tbody>
 		`
@@ -174,7 +179,7 @@
 			let midHTML = "";
 			entryInfo = descrip.replaceAll(new RegExp("(" + keyword + ")",'ig'),`<b style="color:red">$&</b>`);
 			midHTML += "<tr>"
-			midHTML += `<th class="text" style="width: 80px; max-width: 100px; color:white; background:${bgColor}; border-radius: 10px; border: 2px solid ${bgColor}; line-height:12pt;">${source}</th>`;
+			midHTML += `<th style="width: 80px; max-width: 100px; background-color:${bgColor}; border-radius: 10px; border: 2px solid ${bgColor}; line-height:12pt;"><span class="text">${source}</span></th>`;
 			midHTML += `<td style="vertical-align: middle; border: 1px solid #999; padding-left:3px;">${entryInfo}</td>`;
 			midHTML += "</tr>"
 			return midHTML;
